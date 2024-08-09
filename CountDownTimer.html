@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Animated Countdown Timer by vikas lahare</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #3498db, #8e44ad);
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input[type="datetime-local"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            margin: 0 0.5rem;
+        }
+
+        #start-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        #start-btn:hover {
+            background-color: #27ae60;
+        }
+
+        #reset-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        #reset-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .time-block {
+            margin: 0 0.5rem;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .time {
+            font-size: 3rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem;
+            border-radius: 10px;
+            min-width: 80px;
+        }
+
+        .label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .time {
+                font-size: 2rem;
+                min-width: 60px;
+            }
+
+            .label {
+                font-size: 0.8rem;
+            }
+
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Countdown Timer by vikas lahare</h1>
+        <div class="input-group">
+            <label for="start-time">Start Time:</label>
+            <input type="datetime-local" id="start-time">
+        </div>
+        <div class="input-group">
+            <label for="end-time">End Time:</label>
+            <input type="datetime-local" id="end-time">
+        </div>
+        <div class="button-group">
+            <button id="start-btn" onclick="startTimer()">Start Countdown</button>
+            <button id="reset-btn" onclick="resetTimer()">Reset Timer</button>
+        </div>
+        <div class="timer">
+            <div class="time-block">
+                <div class="time" id="days">00</div>
+                <div class="label">Days</div>
+            </div>
+            <div class="time-block">
+                <div class="time" id="hours">00</div>
+                <div class="label">Hours</div>
+            </div>
+            <div class="time-block">
+                <div class="time" id="minutes">00</div>
+                <div class="label">Minutes</div>
+            </div>
+            <div class="time-block">
+                <div class="time" id="seconds">00</div>
+                <div class="label">Seconds</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let countdownInterval;
+        let startTime, endTime;
+
+        function startTimer() {
+            clearInterval(countdownInterval);
+            startTime = new Date(document.getElementById('start-time').value);
+            endTime = new Date(document.getElementById('end-time').value);
+
+            if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+                alert("Please set both start and end times.");
+                return;
+            }
+
+            if (startTime >= endTime) {
+                alert("End time must be after start time.");
+                return;
+            }
+
+            updateTimer();
+            countdownInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const now = new Date();
+            let diff;
+
+            if (now < startTime) {
+                diff = startTime - now;
+                document.querySelector('h1').textContent = "Countdown to Start";
+            } else if (now >= startTime && now < endTime) {
+                diff = endTime - now;
+                document.querySelector('h1').textContent = "Countdown to End";
+            } else {
+                clearInterval(countdownInterval);
+                document.querySelector('h1').textContent = "Countdown Finished";
+                setAllToZero();
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        function resetTimer() {
+            clearInterval(countdownInterval);
+            document.getElementById('start-time').value = '';
+            document.getElementById('end-time').value = '';
+            document.querySelector('h1').textContent = "Countdown Timer";
+            setAllToZero();
+        }
+
+        function setAllToZero() {
+            document.getElementById('days').textContent = '00';
+            document.getElementById('hours').textContent = '00';
+            document.getElementById('minutes').textContent = '00';
+            document.getElementById('seconds').textContent = '00';
+        }
+    </script>
+</body>
+</html>
